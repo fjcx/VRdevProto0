@@ -18,8 +18,7 @@ public class SlidingMenu : MonoBehaviour {
 	public float panelSpacing = 2f;
 	public float backZSpacing = 1f;
 	private int selectedIndex = 0;
-
-	private string currentMode;	// should be enum
+	public string selectedMode;	// should be enum
 
 	private void OnEnable() {
 		m_VRInput.OnSwipe += HandSwipe;
@@ -47,7 +46,7 @@ public class SlidingMenu : MonoBehaviour {
 	}
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		Quaternion rotation = Quaternion.Euler (5, 0, 0);
 
 		for (int i = 0; i < menuOptions.Count; i++) {
@@ -77,6 +76,13 @@ public class SlidingMenu : MonoBehaviour {
 			// keep reference to instantiated menuItems
 			menuOptionObjects.Add (mOpt);
 		}
+
+		updateSelectedMode();
+	}
+
+	private void updateSelectedMode() {
+		MenuOption menuOpt = menuOptionObjects[selectedIndex].GetComponent<MenuOption> ();
+		selectedMode = menuOptions [selectedIndex].description;
 	}
 
 	private void slideMenuLeft () {
@@ -118,6 +124,8 @@ public class SlidingMenu : MonoBehaviour {
 				rend.material.SetColor ("_Color", Color.white);
 			}
 		}
+
+		updateSelectedMode();
 	}
 
 	// Update is called once per frame

@@ -12,14 +12,12 @@ public class MenuOption : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		menuText.text = "MenuItem";
+		//menuText.text = "MenuItem";
 
 		Renderer rend = GetComponent<Renderer>();
 		rend.material.SetColor ("_SpecColor", Color.gray);
 	}
 
-	void
-	
 	// Update is called once per frame
 	void Update () {
 	

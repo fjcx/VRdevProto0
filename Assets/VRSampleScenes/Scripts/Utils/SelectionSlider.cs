@@ -36,7 +36,6 @@ namespace VRStandardAssets.Utils
         private float m_Timer;                                              // Used to determine how much of the bar should be filled.
         private Coroutine m_FillBarRoutine;                                 // Reference to the coroutine that controls the bar filling up, used to stop it if required.
 
-
         private const string k_SliderMaterialPropertyName = "_SliderValue"; // The name of the property on the SlidingUV shader that needs to be changed in order for it to fill.
 
 
