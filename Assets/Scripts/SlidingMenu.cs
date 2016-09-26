@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using VRStandardAssets.Utils;
 using System;
 
+
+// TODO: change to not be a parent of the camera and instead only update position, not rotation with camera !!
+// Have menu appear when selected and surround player maybe
 public class SlidingMenu : MonoBehaviour {
 
 	public GameObject recticle;
