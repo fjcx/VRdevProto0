@@ -1,6 +1,8 @@
 # VrMovementAndUiPrototypes
 Exploration of different types of user movement and UI/UX in VR through prototypes.
 
+Testing Platform: GearVR
+
 Interface Types:
 
 1. "StandingStoneUI" - On swipe up standing stones appear with menu choices around the camera position. Double click selects a stone. Swipe down dismisses stones.
