@@ -40,10 +40,10 @@ public class SlidingMenu : MonoBehaviour {
 		case VRInput.SwipeDirection.DOWN:
 			break;
 		case VRInput.SwipeDirection.LEFT:
-				slideMenuLeft();
+		//		slideMenuLeft();
 			break;
 		case VRInput.SwipeDirection.RIGHT:
-				slideMenuRight();
+		//		slideMenuRight();
 			break;
 		}
 	}
