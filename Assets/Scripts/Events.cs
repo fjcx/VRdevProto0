@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class GameEvent
 {
@@ -29,3 +30,12 @@ public class PlayerSelectedEvent : GameEvent {
 		this.playerName = playerName;
 	}
 }
+
+public class EnableMSicknessEffectEvent : GameEvent {
+	public bool enable { get; private set; }
+
+	public EnableMSicknessEffectEvent(bool enable){
+		this.enable = enable;
+	}
+}
+

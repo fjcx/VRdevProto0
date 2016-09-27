@@ -12,7 +12,10 @@ public class Player : MonoBehaviour {
 	private AIPlayerControl m_AiCharacter;
 	public string playerName;
 	public Boolean isSelected = false;
+	public Boolean isCameraHolder = false;
 	public GameObject selectedCircle;
+
+	private string mode;	// TODO: move this to centralling controlled area (and perhaps movement also!!)
 
 	private void Awake()
 	{
@@ -25,6 +28,7 @@ public class Player : MonoBehaviour {
 		//m_FloorTargeting.OnTargetSet += HandleSetTarget;
 		EventController.Instance.Subscribe<MoveToEvent>(OnMoveToEvent);
 		EventController.Instance.Subscribe<PlayerSelectedEvent>(OnPlayerSelectedEvent);
+		EventController.Instance.Subscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 
 		m_InteractiveItem.OnDoubleClick += HandleDoubleClick;
 		m_InteractiveItem.OnOver += HandleOver;
@@ -37,6 +41,7 @@ public class Player : MonoBehaviour {
 		//m_FloorTargeting.OnTargetSet -= HandleSetTarget;
 		EventController.Instance.UnSubscribe<MoveToEvent>(OnMoveToEvent);
 		EventController.Instance.UnSubscribe<PlayerSelectedEvent>(OnPlayerSelectedEvent);
+		EventController.Instance.UnSubscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 		m_InteractiveItem.OnDoubleClick -= HandleDoubleClick;
 		m_InteractiveItem.OnOver -= HandleOver;
 		m_InteractiveItem.OnOut -= HandleOut;
@@ -45,19 +50,21 @@ public class Player : MonoBehaviour {
 	private void HandleDoubleClick()
 	{
 		Debug.Log ("Clicking player here");
-		EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
+		if (!isCameraHolder) {
+			EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
+		}
 	}
 
 	private void HandleOver()
 	{
-		if (!isSelected) {
+		if (!isSelected && !isCameraHolder) {
 			selectedCircle.SetActive (true);
 		}
 	}
 
 	private void HandleOut()
 	{
-		if (!isSelected) {
+		if (!isSelected && !isCameraHolder) {
 			selectedCircle.SetActive (false);
 		}
 	}
@@ -79,6 +86,20 @@ public class Player : MonoBehaviour {
 			Debug.Log ("playerName: " + playerName + " isSelected and moving");
 			HandleSetTarget (evt.moveToTransform);
 		}
+	}
+
+	private void OnModeUpdatedEvent(ModeUpdatedEvent evt) {
+		mode = evt.newMode;
+
+		if (isCameraHolder) {
+			if (mode == "MotionSicknessMovement") {		// TODO: move these checks to better location
+				EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
+				EventController.Instance.Publish (new EnableMSicknessEffectEvent (true));
+			} else {
+				EventController.Instance.Publish (new EnableMSicknessEffectEvent (false));	// TODO: move these publishes elsewhere!!
+			}
+		}
+
 	}
 
 	private void HandleSetTarget(Transform target)

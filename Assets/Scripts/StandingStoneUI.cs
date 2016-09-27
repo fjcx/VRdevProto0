@@ -5,7 +5,7 @@ using VRStandardAssets.Utils;
 using UnityEngine.UI;
 using System;
 
-public class TombstoneUI : MonoBehaviour {
+public class StandingStoneUI : MonoBehaviour {
 
 	public GameObject mainCamera;	// Used to position tombstones relative to direction mainCamera is looking
 	public GameObject recticle;

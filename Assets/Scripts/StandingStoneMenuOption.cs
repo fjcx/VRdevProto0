@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using VRStandardAssets.Utils;
 
-public class TStoneMenuOption : MonoBehaviour {
+public class StandingStoneMenuOption : MonoBehaviour {
 
 	[SerializeField] private Material m_NormalMaterial;                
 	[SerializeField] private Material m_OverMaterial;                  
