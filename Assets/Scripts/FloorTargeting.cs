@@ -10,9 +10,7 @@ public class FloorTargeting : MonoBehaviour {
 	[SerializeField] private Reticle m_Reticle;                     // This is used to reference the position and use it as the destination.
 	[SerializeField] private VRInteractiveItem m_InteractiveItem;   // The VRInteractiveItem on the target area, used to detect double clicks on the target area.
 
-
 	private bool m_Active;                                          // This determines whether the character can be given targets or not.
-
 
 	private void OnEnable()
 	{
@@ -40,9 +38,12 @@ public class FloorTargeting : MonoBehaviour {
 
 	private void HandleDoubleClick()
 	{
-		// If target setting is active and there are subscribers to OnTargetSet, call it.
-		if (m_Active && OnTargetSet != null) {
-			OnTargetSet (m_Reticle.ReticleTransform);
-		}
+		Debug.Log ("Clicking floor here");
+		EventController.Instance.Publish (new MoveToEvent (m_Reticle.ReticleTransform));
+		//if (m_Active && OnTargetSet != null) {
+			// If target setting is active and there are subscribers to OnTargetSet, call it.
+
+			//OnTargetSet (m_Reticle.ReticleTransform);
+		//}
 	}
 }

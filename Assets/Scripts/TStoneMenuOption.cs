@@ -1,10 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 using VRStandardAssets.Utils;
 
 public class TStoneMenuOption : MonoBehaviour {
-
-	public GameObject tombstoneUI;
 
 	[SerializeField] private Material m_NormalMaterial;                
 	[SerializeField] private Material m_OverMaterial;                  
@@ -14,6 +13,7 @@ public class TStoneMenuOption : MonoBehaviour {
 	[SerializeField] private Renderer m_Renderer;
 
 	public string mode;
+	public Boolean isCurrentMode = false;
 
 	private void Awake ()
 	{
@@ -27,6 +27,7 @@ public class TStoneMenuOption : MonoBehaviour {
 		m_InteractiveItem.OnOut += HandleOut;
 	//	m_InteractiveItem.OnClick += HandleClick;
 		m_InteractiveItem.OnDoubleClick += HandleDoubleClick;
+		EventController.Instance.Subscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 	}
 
 
@@ -36,22 +37,46 @@ public class TStoneMenuOption : MonoBehaviour {
 		m_InteractiveItem.OnOut -= HandleOut;
 	//	m_InteractiveItem.OnClick -= HandleClick;
 		m_InteractiveItem.OnDoubleClick -= HandleDoubleClick;
+		EventController.Instance.UnSubscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 	}
 
+	private void Start() {
+		if (isCurrentMode) {
+			m_Renderer.material = m_DoubleClickedMaterial;
+			updateSelectedMode ();
+		}
+	}
 
-	//Handle the Over event
+	private void OnModeUpdatedEvent(ModeUpdatedEvent evt) {
+		if (evt.newMode == mode) {
+			isCurrentMode = true;
+		} else {
+			isCurrentMode = false;
+			m_Renderer.material = m_NormalMaterial;
+		}
+	}
+		
 	private void HandleOver()
 	{
 		Debug.Log("Show over state");
 		m_Renderer.material = m_OverMaterial;
 	}
-
-
-	//Handle the Out event
+		
 	private void HandleOut()
 	{
 		Debug.Log("Show out state");
-		m_Renderer.material = m_NormalMaterial;
+		if (isCurrentMode) {
+			m_Renderer.material = m_DoubleClickedMaterial;
+		} else {
+			m_Renderer.material = m_NormalMaterial;
+		}
+	}
+
+	private void HandleDoubleClick()
+	{
+		Debug.Log("Show double click");
+		m_Renderer.material = m_DoubleClickedMaterial;
+		updateSelectedMode ();
 	}
 
 
@@ -62,17 +87,7 @@ public class TStoneMenuOption : MonoBehaviour {
 		m_Renderer.material = m_ClickedMaterial;
 	}*/
 
-
-	//Handle the DoubleClick event
-	private void HandleDoubleClick()
-	{
-		Debug.Log("Show double click");
-		m_Renderer.material = m_DoubleClickedMaterial;
-		updateSelectedMode (mode);
-	}
-
-	private void updateSelectedMode (string selectedMode) {
-		TombstoneUI tstoneUIScript = tombstoneUI.GetComponent<TombstoneUI>();
-		tstoneUIScript.SelectMenuItem (selectedMode);
+	private void updateSelectedMode () {
+		EventController.Instance.Publish (new ModeUpdatedEvent (mode));
 	}
 }

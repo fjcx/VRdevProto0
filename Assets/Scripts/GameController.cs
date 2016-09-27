@@ -9,16 +9,17 @@ public class GameController : MonoBehaviour {
 	[SerializeField] private FloorTargeting m_FloorTargeting;     		// This needs to be turned on and off when the game is running and not.
 
 	[SerializeField] private VRInput m_VRInput;
-	//private bool isHidden = false;
-	//public Text currentModeText;
-	//private string currentMode;
+	public Text currentModeText;
+	private string currentMode;
 
 	private void OnEnable() {
 		m_VRInput.OnSwipe += HandSwipe;
+		EventController.Instance.Subscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 	}
 
 	private void OnDisable() {
 		m_VRInput.OnSwipe -= HandSwipe;
+		EventController.Instance.UnSubscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 	}
 
 	private void HandSwipe(VRInput.SwipeDirection swipeDir) {
@@ -32,10 +33,9 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-	private void UpdateCurrentMode() {
-		/*SlidingMenu sMenu = slidingMenu.GetComponent<SlidingMenu>();
-		currentMode = sMenu.selectedMode;
-		currentModeText.text = "Mode: " + currentMode;*/
+	private void OnModeUpdatedEvent(ModeUpdatedEvent evt) {
+		currentMode = evt.newMode;
+		currentModeText.text = "Mode: " + currentMode;
 	}
 
 	// Use this for initialization
