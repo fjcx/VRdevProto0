@@ -20,18 +20,6 @@ public class GameController : MonoBehaviour {
 		EventController.Instance.Subscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 		EventController.Instance.Subscribe<EnableMSicknessEffectEvent>(OnEnableMSicknessEffectEvent);
 		mSicknessEffect = mainCamera.GetComponent<MotionSicknessEffect> ();
-		/*if (mSicknessEffect.isActiveAndEnabled) {
-			Debug.Log ("isEnabled: " + mSicknessEffect);
-		} else {
-			Debug.Log ("notEnabled: " + mSicknessEffect);
-		}
-		mSicknessEffect.enabled = true;
-
-		if (mSicknessEffect.isActiveAndEnabled) {
-			Debug.Log ("isEnabled: " + mSicknessEffect);
-		} else {
-			Debug.Log ("notEnabled: " + mSicknessEffect);
-		}*/
 	}
 
 	private void OnDisable() {
@@ -39,6 +27,7 @@ public class GameController : MonoBehaviour {
 		EventController.Instance.UnSubscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 		EventController.Instance.UnSubscribe<EnableMSicknessEffectEvent>(OnEnableMSicknessEffectEvent);
 	}
+
 
 	private void OnEnableMSicknessEffectEvent(EnableMSicknessEffectEvent evt) {
 		Debug.Log ("Enable MotionSickness: " + evt.enable);
@@ -53,6 +42,8 @@ public class GameController : MonoBehaviour {
 
 		Debug.Log ("isEnabled: " + evt.enable);
 	}
+
+
 
 	private void HandSwipe(VRInput.SwipeDirection swipeDir) {
 		switch (swipeDir) {
