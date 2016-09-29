@@ -15,15 +15,20 @@ public class GameController : MonoBehaviour {
 	private string currentMode;
 	private MotionSicknessEffect mSicknessEffect;
 	private BlinkEffect blinkEffect;
+	private PossesionTrailLauncher pTrailLauncher;
 	private bool canBlink = true;
+
+	public Transform homingTarget;
 
 	private void OnEnable() {
 		m_VRInput.OnSwipe += HandSwipe;
 		EventController.Instance.Subscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 		EventController.Instance.Subscribe<EnableMSicknessEffectEvent>(OnEnableMSicknessEffectEvent);
 		EventController.Instance.Subscribe<PlayBlinkEffectEvent>(OnPlayBlinkEffectEvent);
+		EventController.Instance.Subscribe<SwitchBodiesEvent>(OnSwitchBodiesEvent);
 		mSicknessEffect = mainCamera.GetComponent<MotionSicknessEffect> ();
 		blinkEffect = mainCamera.GetComponent<BlinkEffect> ();
+		pTrailLauncher = mainCamera.GetComponent<PossesionTrailLauncher> ();
 	}
 
 	private void OnDisable() {
@@ -31,6 +36,7 @@ public class GameController : MonoBehaviour {
 		EventController.Instance.UnSubscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 		EventController.Instance.UnSubscribe<EnableMSicknessEffectEvent>(OnEnableMSicknessEffectEvent);
 		EventController.Instance.UnSubscribe<PlayBlinkEffectEvent>(OnPlayBlinkEffectEvent);
+		EventController.Instance.Subscribe<SwitchBodiesEvent>(OnSwitchBodiesEvent);
 	}
 
 
@@ -52,19 +58,9 @@ public class GameController : MonoBehaviour {
 		Debug.Log ("Trying to Blink");
 		if (canBlink) {
 			canBlink = false;	// don't allow any blinking commands while in motion!!
-			Debug.Log ("Play Blink Effect: " + evt.enable);
-
 			blinkEffect.enabled = evt.enable;
-
 			StartCoroutine (CloseEyes (evt.moveTo, evt.closeTimeSpreader, evt.openTimeSpreader, evt.blinkWait));
-
-			if (blinkEffect.isActiveAndEnabled) {
-				Debug.Log ("isEnabled: " + blinkEffect);
-			} else {
-				Debug.Log ("notEnabled: " + blinkEffect);
-			}
-
-			Debug.Log ("isEnabled: " + evt.enable);
+			// TODO: disable blink effect when not in use ??
 		}
 	}
 
@@ -103,6 +99,15 @@ public class GameController : MonoBehaviour {
 		canBlink = true;
 	}
 
+	private void OnSwitchBodiesEvent(SwitchBodiesEvent evt) {
+		Debug.Log ("Switching bodies!");
+		mainCamera.transform.parent = null;
+		mainCamera.transform.position = evt.newBodyTransform.position + new Vector3 (0f, 1.5f, 0f); // adjusting for new body height !!! // TODO: take the actual height
+		mainCamera.transform.rotation = evt.newBodyTransform.rotation;
+		mainCamera.transform.SetParent (evt.newBodyTransform.root);
+		Player targetPlayer = evt.newBodyTransform.root.GetComponent<Player> ();
+		EventController.Instance.Publish (new PlayerSelectedEvent (targetPlayer.playerName));
+	}
 
 	private void HandSwipe(VRInput.SwipeDirection swipeDir) {
 		switch (swipeDir) {
@@ -112,7 +117,7 @@ public class GameController : MonoBehaviour {
 		case VRInput.SwipeDirection.LEFT:
 			break;
 		case VRInput.SwipeDirection.RIGHT:
-			//EventController.Instance.Publish (new PlayBlinkEffectEvent (true));
+			//pTrailLauncher.Launch (homingTarget);
 			break;
 		}
 	}

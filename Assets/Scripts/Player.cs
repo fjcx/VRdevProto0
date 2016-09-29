@@ -53,7 +53,11 @@ public class Player : MonoBehaviour {
 	{
 		Debug.Log ("Clicking player here");
 		if (!isCameraHolder) {
-			EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
+			if (mode == "BodySwitchTeleport") {
+				EventController.Instance.Publish (new SwitchBodiesEvent (transform));
+			} else {
+				EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
+			}
 		}
 	}
 
@@ -76,10 +80,19 @@ public class Player : MonoBehaviour {
 			Debug.Log ("Selected!" + playerName + "/" + evt.playerName);
 			isSelected = true;
 			selectedCircle.SetActive (true);
+
+			if (mode == "BodySwitchTeleport") {
+				isCameraHolder = true;
+			}
+
 		} else {
 			Debug.Log ("DeSelected!" + playerName + "/" + evt.playerName);
 			isSelected = false;
 			selectedCircle.SetActive (false);
+
+			if (mode == "BodySwitchTeleport") {
+				isCameraHolder = false;
+			}
 		}
 	}
 
@@ -115,7 +128,7 @@ public class Player : MonoBehaviour {
 			}
 
 			// TODO: remove redundant checks!!
-			if (mode == "BlinkTeleport") {		// TODO: move these checks to better location, GameController)
+			if (mode == "BlinkTeleport" || mode == "BodySwitchTeleport") {		// TODO: move these checks to better location, GameController)
 				EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
 			}
 		}

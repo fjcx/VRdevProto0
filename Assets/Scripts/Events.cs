@@ -62,4 +62,11 @@ public class TeleportPlayerEvent : GameEvent {
 	}
 }
 
+public class SwitchBodiesEvent : GameEvent {
+	public Transform newBodyTransform { get; private set; }
+
+	public SwitchBodiesEvent(Transform newBodyTransform) {
+		this.newBodyTransform = newBodyTransform;
+	}
+}
 
