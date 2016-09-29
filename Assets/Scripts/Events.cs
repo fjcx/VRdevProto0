@@ -38,37 +38,28 @@ public class EnableMSicknessEffectEvent : GameEvent {
 	}
 }
 
-public class MoveEyeLidsStartEvent : GameEvent {
-	public string movePhase { get; private set; }
+public class PlayBlinkEffectEvent : GameEvent {
+	public bool enable { get; private set; }
 	public Transform moveTo { get; private set; }
-	public float slideDistance { get; private set; }
-	public float blinkTime { get; private set; }
+	public float closeTimeSpreader { get; private set; }
+	public float openTimeSpreader { get; private set; }
 	public float blinkWait { get; private set; }
 
-	public MoveEyeLidsStartEvent(string movePhase, Transform moveTo, float slideDistance, float blinkTime, float blinkWait) {
-		this.movePhase = movePhase;
+	public PlayBlinkEffectEvent(bool enable, Transform moveTo, float closeTimeSpreader, float openTimeSpreader, float blinkWait) {
+		this.enable = enable;
 		this.moveTo = moveTo;
-		this.slideDistance = slideDistance;
-		this.blinkTime = blinkTime;
+		this.closeTimeSpreader = closeTimeSpreader;
+		this.openTimeSpreader = openTimeSpreader;
 		this.blinkWait = blinkWait;
 	}
 }
 
-public class MoveEyeLidsEndEvent : GameEvent {
-	public string movePhase { get; private set; }
+public class TeleportPlayerEvent : GameEvent {
 	public Transform moveTo { get; private set; }
 
-	public MoveEyeLidsEndEvent(string movePhase, Transform moveTo) {
-		this.movePhase = movePhase;
+	public TeleportPlayerEvent(Transform moveTo) {
 		this.moveTo = moveTo;
 	}
 }
 
-public class EyeLidsVisibleEvent : GameEvent {
-	public bool isVisible { get; private set; }
-
-	public EyeLidsVisibleEvent(bool isVisible) {
-		this.isVisible = isVisible;
-	}
-}
 

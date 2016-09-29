@@ -2,7 +2,8 @@
 using System.Collections;
 using System;
 
-//[ExecuteInEditMode]
+[ExecuteInEditMode]
+[RequireComponent(typeof(Camera))]
 public class MotionSicknessEffect : MonoBehaviour {
 
 	public Material mat;

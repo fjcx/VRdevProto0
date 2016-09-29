@@ -14,7 +14,6 @@ public class Player : MonoBehaviour {
 	public Boolean isSelected = false;
 	public Boolean isCameraHolder = false;
 	public GameObject selectedCircle;
-	private bool canBlink = true;
 
 	private string mode;	// TODO: move this to centralling controlled area (and perhaps movement also!!)
 
@@ -30,7 +29,7 @@ public class Player : MonoBehaviour {
 		EventController.Instance.Subscribe<MoveToEvent>(OnMoveToEvent);
 		EventController.Instance.Subscribe<PlayerSelectedEvent>(OnPlayerSelectedEvent);
 		EventController.Instance.Subscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
-		EventController.Instance.Subscribe<MoveEyeLidsEndEvent>(OnMoveEyeLidsEndEvent);
+		EventController.Instance.Subscribe<TeleportPlayerEvent>(OnTeleportPlayerEvent);
 
 		m_InteractiveItem.OnDoubleClick += HandleDoubleClick;
 		m_InteractiveItem.OnOver += HandleOver;
@@ -44,7 +43,7 @@ public class Player : MonoBehaviour {
 		EventController.Instance.UnSubscribe<MoveToEvent>(OnMoveToEvent);
 		EventController.Instance.UnSubscribe<PlayerSelectedEvent>(OnPlayerSelectedEvent);
 		EventController.Instance.UnSubscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
-		EventController.Instance.UnSubscribe<MoveEyeLidsEndEvent>(OnMoveEyeLidsEndEvent);
+		EventController.Instance.UnSubscribe<TeleportPlayerEvent>(OnTeleportPlayerEvent);
 		m_InteractiveItem.OnDoubleClick -= HandleDoubleClick;
 		m_InteractiveItem.OnOver -= HandleOver;
 		m_InteractiveItem.OnOut -= HandleOut;
@@ -86,13 +85,10 @@ public class Player : MonoBehaviour {
 
 	private void OnMoveToEvent(MoveToEvent evt) {
 		if (isSelected == true ) {
-			if (mode == "FadePointTargeting") {
+			if (mode == "BlinkTeleport") {
 				// Blink Move to point
-				Debug.Log ("trying to blink");
-				if (canBlink) {
-					canBlink = false;	// don't allow any sliding commands while in motion!!
-					EventController.Instance.Publish (new MoveEyeLidsStartEvent ("FirstClose", evt.moveToTransform, -0.4f, 0.1f, 0f));
-				}
+				// TODO: expose values for blink !!!
+				EventController.Instance.Publish (new PlayBlinkEffectEvent (true, evt.moveToTransform, 1.1f, 6f, 0f));
 			} else {
 				// Move animation and travesal to point
 				Debug.Log ("playerName: " + playerName + " isSelected and moving");
@@ -101,26 +97,9 @@ public class Player : MonoBehaviour {
 		}
 	}
 
-	private void OnMoveEyeLidsEndEvent(MoveEyeLidsEndEvent evt) {
-		if (isSelected == true) {			// TODO: tidy up to have less conditional checks !!!
-			Debug.Log ("EndPhase: " + evt.movePhase);
-			switch (evt.movePhase) {
-			case "FirstClose":
-				EventController.Instance.Publish (new MoveEyeLidsStartEvent ("FirstOpen", evt.moveTo, 0.4f, 0.1f, 0.3f));
-				break;
-			case "FirstOpen":
-				EventController.Instance.Publish (new MoveEyeLidsStartEvent ("SecondClose", evt.moveTo, -0.4f, 1.0f, 0.6f));
-				break;
-			case "SecondClose":
-				transform.position = evt.moveTo.position;	// is this the best way to teleport?
-				EventController.Instance.Publish (new MoveEyeLidsStartEvent ("SecondOpen", evt.moveTo, 0.4f, 0.3f, 0f));
-				break;
-			case "SecondOpen":
-				canBlink = true;
-				break;
-			default:
-				break;
-			}
+	private void OnTeleportPlayerEvent(TeleportPlayerEvent evt) {
+		if (isSelected == true ) {
+			transform.position = evt.moveTo.position;	// is this the best way to teleport?
 		}
 	}
 
@@ -136,12 +115,8 @@ public class Player : MonoBehaviour {
 			}
 
 			// TODO: remove redundant checks!!
-
-			if (mode == "FadePointTargeting") {		// TODO: move these checks to better location, GameController)
+			if (mode == "BlinkTeleport") {		// TODO: move these checks to better location, GameController)
 				EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
-				EventController.Instance.Publish (new EyeLidsVisibleEvent (true));
-			} else {
-				EventController.Instance.Publish (new EyeLidsVisibleEvent (false));
 			}
 		}
 
