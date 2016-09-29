@@ -9,7 +9,9 @@ Interface Types:
 
 Movement Types:
 
-1. "Third Person Point Targeting" - Select an external character and direct them to the position you are looking at with a double click.
-2. "Motion Sickness Movement" - On double click starts self moving toward the position the rectile is pointing to. Causing the camera to move in such a way may cause motion sickness. A custom shader is applied to see if it alleviates/intensifies motion sickness.
+1. "Third Person Control" - Select an external character and direct them to the position you are looking at with a double click.
+2. "Blink Teleport" - On double click a custom shader displays a blinking effect and the player is teleported to the position the rectile is pointing.
+3. "Motion Sickness Movement" - On double click starts self moving toward the position the rectile is pointing to. Causing the camera to move in such a way may cause motion sickness. A custom shader is applied to see if it alleviates/intensifies motion sickness.
+
 
 New movement and interface types will be added periodically.
