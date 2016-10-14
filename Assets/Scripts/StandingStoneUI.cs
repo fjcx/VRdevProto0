@@ -11,6 +11,7 @@ public class StandingStoneUI : MonoBehaviour {
 	public GameObject recticle;
 	public GameObject tombstoneUI;
 	public Text selectedModeTextPanel;
+    public StandingStoneMenuOption[] childStones;
 
 	//[SerializeField] public List<MenuOptionData> menuOptions = new List<MenuOptionData>();
 	//private List<GameObject> menuOptionObjects = new List<GameObject>();
@@ -21,16 +22,23 @@ public class StandingStoneUI : MonoBehaviour {
 	public Boolean canSlideUp = false;	// This is assuming menu is up when starting !!
 	public Boolean canSlideDown = true;
 
-	private float panelSlideDistance = 2f;
+	private float panelSlideDistance = 0.5f;
 	private float panelSlideTime = 0.5f;
 
 	private void OnEnable() {
-		m_VRInput.OnSwipe += HandSwipe;
+        EventController.Instance.Subscribe<SlideStandingStonesEvent>(OnSlideStandingStonesEvent);
+        m_VRInput.OnSwipe += HandSwipe;
 	}
 
 	private void OnDisable() {
-		m_VRInput.OnSwipe -= HandSwipe;
+        EventController.Instance.UnSubscribe<SlideStandingStonesEvent>(OnSlideStandingStonesEvent);
+        m_VRInput.OnSwipe -= HandSwipe;
 	}
+
+    void Start()
+    {
+        childStones = GetComponentsInChildren<StandingStoneMenuOption>();
+    }
 
 	private void HandSwipe(VRInput.SwipeDirection swipeDir) {
 		switch (swipeDir) {
@@ -54,8 +62,9 @@ public class StandingStoneUI : MonoBehaviour {
 	private void SlideTombstonesUp() {
 		Debug.Log ("trying to slide stones up");
 		if (canSlideUp) {
-			MoveTombstonesToCameraPos ();
-			StartCoroutine (SlideTombstones (panelSlideDistance));
+            MoveTombstonesToCameraPos ();
+            float slideDist = mainCamera.transform.position.y - (panelSlideDistance * 2);
+            StartCoroutine (SlideTombstones (slideDist));
 		}
 		canSlideDown = true;
 	}
@@ -65,10 +74,11 @@ public class StandingStoneUI : MonoBehaviour {
 	private void SlideTombstonesDown() {
 		Debug.Log ("trying to slide stones down");
 		if (canSlideDown) {
-			StartCoroutine (SlideTombstones (-panelSlideDistance));
+            float slideDist = mainCamera.transform.position.y + panelSlideDistance;
+            StartCoroutine (SlideTombstones (-slideDist));
 		}
 		canSlideUp = true;
-	}
+    }
 
 	private void MoveTombstonesToCameraPos() {
 		transform.position = new Vector3 (mainCamera.transform.position.x, -panelSlideDistance, mainCamera.transform.position.z);
@@ -76,7 +86,15 @@ public class StandingStoneUI : MonoBehaviour {
 	}
 
 	private IEnumerator SlideTombstones(float distance) {
-		canSlideUp = false;		// don't allow any sliding commands while in motion!!
+        // Show stones if they are hidden
+        if (distance > 0)
+        {
+            foreach (StandingStoneMenuOption childStone in childStones)
+            {
+                childStone.ShowStone();
+            }
+        }
+        canSlideUp = false;		// don't allow any sliding commands while in motion!!
 		canSlideDown = false;
 		Vector3 startPos = transform.position;
 		Vector3 endPos = transform.position + new Vector3 (0, distance, 0);
@@ -87,12 +105,32 @@ public class StandingStoneUI : MonoBehaviour {
 			yield return null;
 		}
 		transform.position = endPos;
-	}
+        // Hide standing stone child renderers (in case floating in air or such)
+        if (distance < 0)
+        {
+            foreach (StandingStoneMenuOption childStone in childStones)
+            {
+                childStone.HideStone();
+            }
+        }
+
+    }
 
 	// TODO: make menuItem an enum
 	public void SelectMenuItem(string menuItem) {
 		selectedMode = menuItem;
 		selectedModeTextPanel.text = "Mode: " + selectedMode;
-	}
+    }
+
+    private void OnSlideStandingStonesEvent(SlideStandingStonesEvent evt)
+    {
+        if ("down" == evt.slideStonesDirection) {
+            SlideTombstonesDown();
+        } else if ("up" == evt.slideStonesDirection) {
+            SlideTombstonesUp();
+        } else {
+            Debug.Log(evt.slideStonesDirection + "is not a valid sliding direction!");
+        }
+    }
 
 }

@@ -62,11 +62,32 @@ public class TeleportPlayerEvent : GameEvent {
 	}
 }
 
+public class LaunchPTrailEvent : GameEvent
+{
+    public Transform targetBodyTransform { get; private set; }
+
+    public LaunchPTrailEvent(Transform targetBodyTransform)
+    {
+        this.targetBodyTransform = targetBodyTransform;
+    }
+}
+
 public class SwitchBodiesEvent : GameEvent {
 	public Transform newBodyTransform { get; private set; }
 
 	public SwitchBodiesEvent(Transform newBodyTransform) {
 		this.newBodyTransform = newBodyTransform;
 	}
+}
+
+
+public class SlideStandingStonesEvent : GameEvent
+{
+    public String slideStonesDirection { get; private set; }
+
+    public SlideStandingStonesEvent(String slideStonesDirection)
+    {
+        this.slideStonesDirection = slideStonesDirection;
+    }
 }
 

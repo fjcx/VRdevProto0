@@ -5,17 +5,18 @@ using UnityStandardAssets.Characters.ThirdPerson;		// if updating use other name
 using VRStandardAssets.Utils;
 
 public class Player : MonoBehaviour {
-	
-	//[SerializeField] private FloorTargeting m_FloorTargeting;                 // This triggers an event when the target is set. 
 
-	[SerializeField] private VRInteractiveItem m_InteractiveItem;
+    //[SerializeField] private FloorTargeting m_FloorTargeting;                 // This triggers an event when the target is set. 
+
+    [SerializeField] private GameObject mainCamera;
+    [SerializeField] private VRInteractiveItem m_InteractiveItem;
 	private AIPlayerControl m_AiCharacter;
 	public string playerName;
 	public Boolean isSelected = false;
 	public Boolean isCameraHolder = false;
 	public GameObject selectedCircle;
 
-	private string mode;	// TODO: move this to centralling controlled area (and perhaps movement also!!)
+    private string mode;	// TODO: move this to centralling controlled area (and perhaps movement also!!)
 
 	private void Awake()
 	{
@@ -54,8 +55,9 @@ public class Player : MonoBehaviour {
 		Debug.Log ("Clicking player here");
 		if (!isCameraHolder) {
 			if (mode == "BodySwitchTeleport") {
-				EventController.Instance.Publish (new SwitchBodiesEvent (transform));
-			} else {
+                EventController.Instance.Publish(new LaunchPTrailEvent(transform));
+                //EventController.Instance.Publish (new SwitchBodiesEvent (transform));
+            } else {
 				EventController.Instance.Publish (new PlayerSelectedEvent (playerName));
 			}
 		}
@@ -102,18 +104,22 @@ public class Player : MonoBehaviour {
 				// Blink Move to point
 				// TODO: expose values for blink !!!
 				EventController.Instance.Publish (new PlayBlinkEffectEvent (true, evt.moveToTransform, 1.1f, 6f, 0f));
-			} else {
-				// Move animation and travesal to point
-				Debug.Log ("playerName: " + playerName + " isSelected and moving");
-				HandleSetTarget (evt.moveToTransform);
-			}
-		}
+			} else if (mode == "BodySwitchTeleport") {
+                // No Move To Allowed in this mode, so do nothing !!!
+            } else {
+                // Move animation and travesal to point
+                Debug.Log("playerName: " + playerName + " isSelected and moving");
+                HandleSetTarget(evt.moveToTransform);
+            }
+        }
 	}
 
 	private void OnTeleportPlayerEvent(TeleportPlayerEvent evt) {
 		if (isSelected == true ) {
-			transform.position = evt.moveTo.position;	// is this the best way to teleport?
-		}
+            Debug.Log("evt.moveTo.position: " + evt.moveTo.position);
+            m_AiCharacter.SetWarpTarget(evt.moveTo.position);
+            //transform.position = evt.moveTo.position;	// is this the best way to teleport?
+        }
 	}
 
 	private void OnModeUpdatedEvent(ModeUpdatedEvent evt) {
@@ -144,4 +150,5 @@ public class Player : MonoBehaviour {
 		m_AiCharacter.SetTarget(target.position);
 		//m_AgentTrail.SetDestination();
 	}
+
 }

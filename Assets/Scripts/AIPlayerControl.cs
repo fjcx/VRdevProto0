@@ -44,5 +44,11 @@ public class AIPlayerControl : MonoBehaviour
 		isTravelling = true;
 		this.targetPos = targetPos;
     }
+
+    public void SetWarpTarget(Vector3 targetPos)
+    {
+        // TODO: add some other checks in here?
+        agent.Warp(targetPos);
+    }
 }
 

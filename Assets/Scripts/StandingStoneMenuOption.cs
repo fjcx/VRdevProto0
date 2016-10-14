@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System;
 using VRStandardAssets.Utils;
@@ -11,8 +12,9 @@ public class StandingStoneMenuOption : MonoBehaviour {
 	[SerializeField] private Material m_DoubleClickedMaterial;         
 	[SerializeField] private VRInteractiveItem m_InteractiveItem;
 	[SerializeField] private Renderer m_Renderer;
+    [SerializeField] private Text stoneText;
 
-	public string mode;
+    public string mode;
 	public Boolean isCurrentMode = false;
 
 	private void Awake ()
@@ -77,17 +79,30 @@ public class StandingStoneMenuOption : MonoBehaviour {
 		Debug.Log("Show double click");
 		m_Renderer.material = m_DoubleClickedMaterial;
 		updateSelectedMode ();
-	}
+        EventController.Instance.Publish(new SlideStandingStonesEvent("down"));     // TODO: Should change to enum
+    }
+
+    public void HideStone()
+    {
+        stoneText.enabled = false;
+        m_Renderer.enabled = false;
+    }
+
+    public void ShowStone()
+    {
+        stoneText.enabled = true;
+        m_Renderer.enabled = true;
+    }
 
 
-	//Handle the Click event
-	/*private void HandleClick()
+    //Handle the Click event
+    /*private void HandleClick()
 	{
 		Debug.Log("Show click state");
 		m_Renderer.material = m_ClickedMaterial;
 	}*/
 
-	private void updateSelectedMode () {
+    private void updateSelectedMode () {
 		EventController.Instance.Publish (new ModeUpdatedEvent (mode));
 	}
 }

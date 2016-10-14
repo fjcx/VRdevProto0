@@ -26,7 +26,8 @@ public class GameController : MonoBehaviour {
 		EventController.Instance.Subscribe<EnableMSicknessEffectEvent>(OnEnableMSicknessEffectEvent);
 		EventController.Instance.Subscribe<PlayBlinkEffectEvent>(OnPlayBlinkEffectEvent);
 		EventController.Instance.Subscribe<SwitchBodiesEvent>(OnSwitchBodiesEvent);
-		mSicknessEffect = mainCamera.GetComponent<MotionSicknessEffect> ();
+        EventController.Instance.Subscribe<LaunchPTrailEvent>(OnLaunchPTrailEvent);
+        mSicknessEffect = mainCamera.GetComponent<MotionSicknessEffect> ();
 		blinkEffect = mainCamera.GetComponent<BlinkEffect> ();
 		pTrailLauncher = mainCamera.GetComponent<PossesionTrailLauncher> ();
 	}
@@ -36,8 +37,9 @@ public class GameController : MonoBehaviour {
 		EventController.Instance.UnSubscribe<ModeUpdatedEvent>(OnModeUpdatedEvent);
 		EventController.Instance.UnSubscribe<EnableMSicknessEffectEvent>(OnEnableMSicknessEffectEvent);
 		EventController.Instance.UnSubscribe<PlayBlinkEffectEvent>(OnPlayBlinkEffectEvent);
-		EventController.Instance.Subscribe<SwitchBodiesEvent>(OnSwitchBodiesEvent);
-	}
+		EventController.Instance.UnSubscribe<SwitchBodiesEvent>(OnSwitchBodiesEvent);
+        EventController.Instance.UnSubscribe<LaunchPTrailEvent>(OnLaunchPTrailEvent);
+    }
 
 
 	private void OnEnableMSicknessEffectEvent(EnableMSicknessEffectEvent evt) {
@@ -100,7 +102,7 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void OnSwitchBodiesEvent(SwitchBodiesEvent evt) {
-		Debug.Log ("Switching bodies!");
+        Debug.Log ("Switching bodies!");
 		mainCamera.transform.parent = null;
 		mainCamera.transform.position = evt.newBodyTransform.position + new Vector3 (0f, 1.5f, 0f); // adjusting for new body height !!! // TODO: take the actual height
 		mainCamera.transform.rotation = evt.newBodyTransform.rotation;
@@ -109,7 +111,13 @@ public class GameController : MonoBehaviour {
 		EventController.Instance.Publish (new PlayerSelectedEvent (targetPlayer.playerName));
 	}
 
-	private void HandSwipe(VRInput.SwipeDirection swipeDir) {
+    private void OnLaunchPTrailEvent(LaunchPTrailEvent evt)
+    {
+        // TODO: add null checks !
+        pTrailLauncher.Launch(evt.targetBodyTransform);
+    }
+
+    private void HandSwipe(VRInput.SwipeDirection swipeDir) {
 		switch (swipeDir) {
 		case VRInput.SwipeDirection.NONE:
 		case VRInput.SwipeDirection.UP:
